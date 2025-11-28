@@ -1,20 +1,18 @@
-from app.database import Database
+from app.database import db # ¡Ahora funciona!
 from datetime import datetime
 
-db = Database()
-
 class Customer:
+    """Modelo de Cliente."""
     def __init__(self, name, phone=None, email=None, id=None, created_at=None, updated_at=None):
         self.id = id
         self.name = name
         self.phone = phone
         self.email = email
-        # Convertir a string si es objeto datetime para guardar en SQLITE
         self.created_at = created_at or datetime.now().isoformat()
         self.updated_at = updated_at or datetime.now().isoformat()
 
     # -----------------------------
-    # CREATE (CORREGIDO)
+    # CREATE
     # -----------------------------
     @staticmethod
     def create(name, phone=None, email=None):
@@ -25,7 +23,6 @@ class Customer:
         created_at = datetime.now().isoformat()
         updated_at = datetime.now().isoformat()
         
-        # CORRECCIÓN: Capturamos directamente el ID retornado por db.execute()
         customer_id = db.execute(query, (name, phone, email, created_at, updated_at))
         
         return customer_id
@@ -39,17 +36,17 @@ class Customer:
         rows = db.fetch(query, (customer_id,))
 
         if not rows:
-            return None # Retorna None si no hay resultados
+            return None 
         
-        # El código de mapeo es correcto, se adapta a las 6 columnas
+        # Acceso por nombre de columna
         r = rows[0]
         return Customer(
-            id=r[0],
-            name=r[1],
-            phone=r[2],
-            email=r[3],
-            created_at=r[4],
-            updated_at=r[5]
+            id=r['id'],
+            name=r['name'],
+            phone=r['phone'],
+            email=r['email'],
+            created_at=r['created_at'],
+            updated_at=r['updated_at']
         )
 
     # -----------------------------
@@ -61,12 +58,13 @@ class Customer:
 
         return [
             {
-                "id": r[0],
-                "name": r[1],
-                "phone": r[2],
-                "email": r[3],
-                "created_at": r[4],
-                "updated_at": r[5]
+                # Acceso por nombre de columna
+                "id": r['id'],
+                "name": r['name'],
+                "phone": r['phone'],
+                "email": r['email'],
+                "created_at": r['created_at'],
+                "updated_at": r['updated_at']
             }
             for r in rows
         ]
@@ -86,7 +84,6 @@ class Customer:
             WHERE id=?
         """
         
-        # db.execute(query) retorna el ID de la fila (self.id), lo cual es útil para verificar
         db.execute(query, (self.name, self.phone, self.email, self.updated_at, self.id))
 
     # -----------------------------
