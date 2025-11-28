@@ -5,6 +5,8 @@ def create_tables():
     
     # Sentencias SQL para crear las tablas
     queries = [
+
+        
         # Tabla CUSTOMERS
         """
         CREATE TABLE IF NOT EXISTS customers (
